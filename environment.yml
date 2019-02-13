@@ -1,0 +1,6 @@
+name: meow
+dependencies:
+  - python=3
+  - numpy
+  - scipy
+  - pip
