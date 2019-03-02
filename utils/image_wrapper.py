@@ -16,7 +16,6 @@ class image_wrapper(object):
         # the self.VARIABLE_NAME. The same is true if
         # you want to use functions defined /inside/ of
         # the image_wrapper class definition, e.g.:
-        #   self.load()
         self.img = self.load(image_name)
         return
 
