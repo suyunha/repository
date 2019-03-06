@@ -3,9 +3,10 @@
 #from scipy.misc import imshow
 from matplotlib.pyplot import imshow
 from matplotlib.pyplot import show
-from constants import IMG_DIR_PATH
+from utils.constants import IMG_DIR_PATH
 from os.path import join
-import imageio
+from numpy import uint8
+from imageio import imread
 
 class image_wrapper(object):
     
@@ -44,8 +45,8 @@ class image_wrapper(object):
         # a 'with:' block in combination with the 'open()'
         # function.
         #
-        with open(join(IMG_DIR_PATH, image_name)) as imgfile:
-            img_array = imageio.imread(imgfile) # Modify this assignment to return the correct result
+        img_file_name = join(IMG_DIR_PATH, image_name)
+        img_array = imread(img_file_name).astype(uint8) # Modify this assignment to return the correct result
         #
         return img_array
 
@@ -84,8 +85,7 @@ class image_wrapper(object):
         # image.
         # Hint 2: Make sure to use the image data saved inside of
         # the object: self.img
-
-        #show(imshow(self.img))
+        imshow(self.img)
+        show()
         return
 
-a = image_wrapper("example.png")
