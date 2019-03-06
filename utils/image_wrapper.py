@@ -1,8 +1,11 @@
-from scipy.misc import imread
-from scipy.misc import imsave
-from scipy.misc import imshow
+#from scipy.misc import imread
+#from scipy.misc import imsave
+#from scipy.misc import imshow
+from matplotlib.pyplot import imshow
 from matplotlib.pyplot import show
-from utils.constants import IMG_DIR_PATH
+from constants import IMG_DIR_PATH
+from os.path import join
+import imageio
 
 class image_wrapper(object):
     
@@ -41,7 +44,8 @@ class image_wrapper(object):
         # a 'with:' block in combination with the 'open()'
         # function.
         #
-        img_array = None # Modify this assignment to return the correct result
+        with open(join(IMG_DIR_PATH, image_name)) as imgfile:
+            img_array = imageio.imread(imgfile) # Modify this assignment to return the correct result
         #
         return img_array
 
@@ -68,6 +72,7 @@ class image_wrapper(object):
         # function.
         # Hint 3: Make sure to use the image data saved inside of
         # the object: self.img
+        #imageio.imsave(image_name, self.img)
         return
 
     def view(self):
@@ -79,4 +84,8 @@ class image_wrapper(object):
         # image.
         # Hint 2: Make sure to use the image data saved inside of
         # the object: self.img
+
+        #show(imshow(self.img))
         return
+
+a = image_wrapper("example.png")
