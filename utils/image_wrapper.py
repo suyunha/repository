@@ -10,7 +10,7 @@ from imageio import imread
 
 class image_wrapper(object):
     
-    def __init__(self, image_name):
+    def __init__(self, image_name=None, image_array=None, padding_size=None):
         '''Creates wrapper from the specified image'''
         #
         # Note: in order to access variables that
@@ -20,7 +20,18 @@ class image_wrapper(object):
         # the self.VARIABLE_NAME. The same is true if
         # you want to use functions defined /inside/ of
         # the image_wrapper class definition, e.g.:
-        self.img = self.load(image_name)
+        if image_name is not None:
+            self.img = self.load(image_name)
+        else:
+            if image_array is None:
+                raise Exception("Must provide either image_name or image_array")
+            
+            if padding_size is None:
+                self.img = image_array
+            else:
+                self.img = self.extract_from_padding(image_array, padding_size)
+            #
+        #
         return
 
     def load(self, image_name):
@@ -90,3 +101,20 @@ class image_wrapper(object):
         show()
         return
 
+    def extract_from_padding(self, image_array, padding_size):
+        '''Return an the part of the image array that is not padding.'''
+        extracted_image_array = None
+        #
+        # I'll let you figure this one out by yourself. :)
+
+        #
+        return extracted_image_array
+
+    def get_padded_image(self, padding_size=None):
+        '''Return the wrapper's image with padding added.'''
+        padded_image = None
+        #
+        # I'll let you figure this one out by yourself. :)
+
+        #
+        return padded_image
