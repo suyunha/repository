@@ -47,6 +47,7 @@ class image_wrapper(object):
         #
         img_file_name = join(IMG_DIR_PATH, image_name)
         img_array = imread(img_file_name).astype(uint8) # Modify this assignment to return the correct result
+        #img_array = imread(img_file_name)
         #
         return img_array
 
