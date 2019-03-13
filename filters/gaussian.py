@@ -4,6 +4,9 @@ from numpy import pad
 from numpy import sum
 from numpy import convolve
 from utils.image_wrapper import image_wrapper
+from numpy import empty
+from scipy.stats import norm
+from numpy import float64
 
 
 def two_d_gaussian_filter(img_wrapper, padding_type='mirror', kernel_length=5):
@@ -11,14 +14,15 @@ def two_d_gaussian_filter(img_wrapper, padding_type='mirror', kernel_length=5):
     # First, get a padded version of the image
     #
     # You will have to implement the 'get_padded_img()' method in the img_wrapper class
-    padded_image = img_wrapper.get_padded_img(padding_size=kernel_length)
+    padded_image = img_wrapper.get_padded_image(padding_size=kernel_length)
     #
     # Generate the 1D Gaussian kernel using either:
     #   - true_one_d_gaussian_kernel, or
     #   - approximate_one_d_gaussian_kernel
     #
     # You will have to implement these functions below
-    one_d_gaussian_kernel = approximate_one_d_gaussian_kernel(desired_kernel_length=kernel_length)
+    #one_d_gaussian_kernel = approximate_one_d_gaussian_kernel(desired_kernel_length=kernel_length)
+    one_d_gaussian_kernel = true_one_d_gaussian_kernel(desired_kernel_length = kernel_length)
     #
     # Apply the filter to the image using the function sepfir2d(). 
     # Note:
@@ -48,7 +52,7 @@ def true_one_d_gaussian_kernel(desired_kernel_length=5, desired_probability_mass
     '''
     #
     # Initialize
-    one_d_gaussian_kernel = None
+    one_d_gaussian_kernel = empty(desired_kernel_length)
     #
     # Throw an error if the kernel length is not odd
     if desired_kernel_length % 2 == 0: 
@@ -59,11 +63,12 @@ def true_one_d_gaussian_kernel(desired_kernel_length=5, desired_probability_mass
     #   1. Use the inverse CDF function to compute y1 such that P(X < y1) = (1/2) * (desired_probability_mass + 1)
     #   2. Use the inverse CDF function to compute y2 such that P(x < y2) = (1/2) * (1 - desired_probability_mass)
     #   3. Compute 2 * x = y1 - y2
+    x = norm.ppf(.5 * (desired_probability_mass + 1))
 
     #
     # Second, figure out how big the interval corresponding to each pixel will be
     # Hint: Assume each pixel corresponds to an interval of equal length, interval_length, and that interval_length * desired_kernel_length = 2 * x
-
+    interval_length = (x * 2)/desired_kernel_length
     #
     # Third, create an array containing the left boundary of every interval and an array containing 
     # the right boundary of every interval
@@ -74,16 +79,24 @@ def true_one_d_gaussian_kernel(desired_kernel_length=5, desired_probability_mass
     #   4. The right boundary of the /last/ interval is just x
     #   5. Reverse the ints array and call it reverse_ints
     #   6. right_boundary_array = x - interval_length * reverse_ints 
+    left_boundary_array = empty(desired_kernel_length)
+    right_boundary_array = empty(desired_kernel_length)
 
+    for n in range(0, desired_kernel_length):
+        left_boundary_array[n] = -x + (n * interval_length)
+        right_boundary_array[desired_kernel_length-1-n] = x - (n * interval_length)
     #
     # Fourth, compute the CDF of left_boundary_array and right_boundary_array. The CDF function is designed to 
     # accept ndarrays as arguments, so you can do each array all at once.
-
+    cdf_left_boundary_array = norm.cdf(left_boundary_array)
+    cdf_right_boundary_array = norm.cdf(right_boundary_array)
     #
     # Fifth, compute the difference cdf_right_boundary_array - cdf_left_boundary_array. Call it one_d_gaussian_kernel.
     # This is your penultimate result and each entry in this array is the not-normalized weight that will be
     # assigned to the pixels in the neighborhood of the pixel that you are blurring.  Each entry is the 
     # probability associated with the interval corresponding to a given pixel.
+    for n in range(0, desired_kernel_length):
+        one_d_gaussian_kernel[n] = (cdf_right_boundary_array[n] - cdf_left_boundary_array[n])/(desired_probability_mass)
 
     #
     # Finally, normalize the result so that sum(one_d_gaussian_kernel) = 1.

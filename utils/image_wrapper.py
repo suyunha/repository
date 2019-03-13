@@ -7,6 +7,9 @@ from utils.constants import IMG_DIR_PATH
 from os.path import join
 from numpy import uint8
 from imageio import imread
+from numpy import empty
+from numpy import shape
+from numpy import put
 
 class image_wrapper(object):
     
@@ -98,23 +101,52 @@ class image_wrapper(object):
         # Hint 2: Make sure to use the image data saved inside of
         # the object: self.img
         imshow(self.img)
+        #imshow(self.extract_from_padding(image_array = self.get_padded_image(padding_size=20), padding_size = 20))
         show()
         return
 
     def extract_from_padding(self, image_array, padding_size):
         '''Return an the part of the image array that is not padding.'''
-        extracted_image_array = None
+        #extracted_image_array = None
         #
         # I'll let you figure this one out by yourself. :)
+        size = self.img.shape
+        extracted_image_array = empty([size[0], size[1], size[2]], dtype = uint8)
+        
+        for z in range(size[2]):
+            for y in range(size[1]):
+                for x in range(size[0]):
+                    extracted_image_array[x, y, z] = image_array[x+padding_size-1, y+padding_size-1, z]
+
 
         #
         return extracted_image_array
 
     def get_padded_image(self, padding_size=None):
         '''Return the wrapper's image with padding added.'''
-        padded_image = None
+        #padded_image = None
         #
         # I'll let you figure this one out by yourself. :)
+        size = self.img.shape
+        padded_image = empty([size[0]+2*padding_size, size[1]+2*padding_size, size[2]], dtype = uint8)
+        copypos = [0, 0, 0]
 
-        #
+        for z in range(size[2]):
+            copypos[2] = z
+            for y in range(size[1] + 2*padding_size):
+                if (y<padding_size):
+                    copypos[1] = padding_size - y
+                elif (y>=padding_size+size[1]):
+                    copypos[1] = size[1] - 1 - (y-size[1]-padding_size)
+                else:
+                    copypos[1] = y - padding_size
+                for x in range(size[0] + 2*padding_size):
+                    if (x<padding_size):
+                        copypos[0] = padding_size - x
+                    elif (x>=padding_size+size[0]):
+                        copypos[0] = size[0] - 1 - (x-size[0]-padding_size)
+                    else:
+                        copypos[0] = x - padding_size
+                    padded_image[x, y, z] = self.img[copypos[0], copypos[1], copypos[2]]
+
         return padded_image
