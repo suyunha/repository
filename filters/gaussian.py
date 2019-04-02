@@ -1,12 +1,12 @@
 from scipy.signal import sepfir2d
-from numpy import ones
+from numpy import ones, zeros
 from numpy import pad
 from numpy import sum
 from numpy import convolve
 from utils.image_wrapper import image_wrapper
 from numpy import empty
 from scipy.stats import norm
-from numpy import float64
+from numpy import float32
 
 
 def two_d_gaussian_filter(img_wrapper, padding_type='mirror', kernel_length=5):
@@ -21,8 +21,8 @@ def two_d_gaussian_filter(img_wrapper, padding_type='mirror', kernel_length=5):
     #   - approximate_one_d_gaussian_kernel
     #
     # You will have to implement these functions below
-    #one_d_gaussian_kernel = approximate_one_d_gaussian_kernel(desired_kernel_length=kernel_length)
-    one_d_gaussian_kernel = true_one_d_gaussian_kernel(desired_kernel_length = kernel_length)
+    one_d_gaussian_kernel = approximate_one_d_gaussian_kernel(desired_kernel_length=kernel_length)
+    #one_d_gaussian_kernel = true_one_d_gaussian_kernel(desired_kernel_length = kernel_length)
     #
     # Apply the filter to the image using the function sepfir2d(). 
     # Note:
@@ -31,7 +31,10 @@ def two_d_gaussian_filter(img_wrapper, padding_type='mirror', kernel_length=5):
     #   means that the same kernel will be used for both the horizontal
     #   and vertical directions. It's possible to use different ones in
     #   each direction.
-    blurred_img = sepfir2d(padded_image, one_d_gaussian_kernel, one_d_gaussian_kernel)
+    a = padded_image.shape
+    blurred_img = zeros(a)
+    for z in range(a[2]):
+        blurred_img[:, :, z] = sepfir2d(padded_image[:, :, z], one_d_gaussian_kernel, one_d_gaussian_kernel)
     #
     # Create a new img_wrapper using the blurred img
     #
@@ -52,7 +55,7 @@ def true_one_d_gaussian_kernel(desired_kernel_length=5, desired_probability_mass
     '''
     #
     # Initialize
-    one_d_gaussian_kernel = empty(desired_kernel_length)
+    one_d_gaussian_kernel = empty(desired_kernel_length, dtype = float32)
     #
     # Throw an error if the kernel length is not odd
     if desired_kernel_length % 2 == 0: 
@@ -115,7 +118,7 @@ def approximate_one_d_gaussian_kernel(desired_kernel_length=5):
     '''
     #
     # Initialize
-    one_d_gaussian_kernel = None
+    one_d_gaussian_kernel = (None)
     #
     # Throw an error if the kernel length != 4*n + 1, for some integer n
     if (desired_kernel_length - 1) % 4 != 0: 
@@ -126,16 +129,24 @@ def approximate_one_d_gaussian_kernel(desired_kernel_length=5):
     #
     # Create a 1D box kernel of length d using the ones() function. Call it box_kernel
 
+    box_kernel = ones(d, dtype=float32)
+
     #
     # Pad box_kernel with d zeroes on either side using the pad() function in 'constant' mode
+
+    pad(box_kernel, d, 'constant')
 
     #
     # Create a 1D tent kernel by convolving box_kernel with box_kernel (itself), using
     # the convolve() function. Call it tent_kernel
 
+    tent_kernel = convolve(box_kernel, box_kernel)
+
     #
     # Approximate the Gaussian kernel by convolving tent_kernel with tent_kernel (itself), 
     # using the convolve() function. Assign it to one_d_gaussian_kernel
+
+    one_d_gaussian_kernel = convolve(tent_kernel, tent_kernel)
 
     #
     # You'll notice that the size of one_d_gaussian_kernel is too big. That's because it
@@ -148,6 +159,13 @@ def approximate_one_d_gaussian_kernel(desired_kernel_length=5):
     #   4. Make sure you still assign the extraction to one_d_gaussian_kernel :)
     #
     # Normalize one_d_gaussian_kernel so that sum(one_d_gaussian_kernel) = 1
+
+    n = len(one_d_gaussian_kernel)
+    zed = n - desired_kernel_length
+    one_d_gaussian_kernel = one_d_gaussian_kernel[(zed//2):(zed//2+desired_kernel_length)]
+    norm = sum(one_d_gaussian_kernel)
+    for x in range(desired_kernel_length):
+        one_d_gaussian_kernel[x] = one_d_gaussian_kernel[x]/norm
 
     #
     return one_d_gaussian_kernel

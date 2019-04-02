@@ -110,12 +110,13 @@ class image_wrapper(object):
         #extracted_image_array = None
         #
         # I'll let you figure this one out by yourself. :)
-        size = self.img.shape
-        extracted_image_array = empty([size[0], size[1], size[2]], dtype = uint8)
+        size = image_array.shape
+        print(size)
+        extracted_image_array = empty([size[0]-2*padding_size, size[1]-2*padding_size, size[2]], dtype = uint8)
         
         for z in range(size[2]):
-            for y in range(size[1]):
-                for x in range(size[0]):
+            for y in range(size[1]-2*padding_size):
+                for x in range(size[0]-2*padding_size):
                     extracted_image_array[x, y, z] = image_array[x+padding_size-1, y+padding_size-1, z]
 
 
@@ -130,6 +131,8 @@ class image_wrapper(object):
         size = self.img.shape
         padded_image = empty([size[0]+2*padding_size, size[1]+2*padding_size, size[2]], dtype = uint8)
         copypos = [0, 0, 0]
+
+        #rewrite this eventually maybe
 
         for z in range(size[2]):
             copypos[2] = z

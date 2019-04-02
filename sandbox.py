@@ -3,5 +3,5 @@ from filters.gaussian import two_d_gaussian_filter
 from numpy import shape
 
 a = image_wrapper("example.png")
-b = two_d_gaussian_filter(img_wrapper = a)
+b = two_d_gaussian_filter(img_wrapper = a, kernel_length = 21)
 b.view()
