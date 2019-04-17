@@ -153,3 +153,12 @@ class image_wrapper(object):
                     padded_image[x, y, z] = self.img[copypos[0], copypos[1], copypos[2]]
 
         return padded_image
+
+    def resize_image_for_watermarking(self, transform_size):
+        """
+        Must be a multiple of N in both length and width, where N = transform_size
+        """
+
+        return
+
+    
