@@ -10,6 +10,7 @@ from imageio import imread
 from numpy import empty
 from numpy import shape
 from numpy import put
+from skimage.transform import resize
 
 class image_wrapper(object):
     
@@ -158,6 +159,14 @@ class image_wrapper(object):
         """
         Must be a multiple of N in both length and width, where N = transform_size
         """
+        size = self.img.shape
+        while (size[0]%transform_size != 0):
+            size[0] = size[0] + 1
+        while (size[1]%transform_size != 0):
+            size[1] = size[1] + 1
+
+        self.img = resize(self.img, size)
+
 
         return
 
